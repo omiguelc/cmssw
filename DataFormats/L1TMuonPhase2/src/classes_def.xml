@@ -21,5 +21,15 @@
  <class name="std::vector<l1t::SAMuon>"/>
  <class name="edm::Wrapper<std::vector<l1t::SAMuon > >"/>
  <class name="edm::Ref<l1t::SAMuonCollection>" splitLevel="0"/>
+ <class name="l1t::phase2::EMTFHit"/>
+ <class name="l1t::phase2::EMTFHitCollection"/>
+ <class name="edm::Wrapper<l1t::phase2::EMTFHitCollection>"/>
+ <class name="l1t::phase2::EMTFTrack"/>
+ <class name="l1t::phase2::EMTFTrackCollection"/>
+ <class name="edm::Wrapper<l1t::phase2::EMTFTrackCollection>"/>
+ <class name="l1t::phase2::EMTFInput"/>
+ <class name="l1t::phase2::EMTFInputCollection"/>
+ <class name="edm::Wrapper<l1t::phase2::EMTFInputCollection>"/>
+
  </selection>
 </lcgdict>
