@@ -49,7 +49,6 @@ void OutputLayer::apply(
             // Increase hit count
             if (site_bit == 1) {
                 hit_count += 1;
-
             }
 
             // Convert segment to hit

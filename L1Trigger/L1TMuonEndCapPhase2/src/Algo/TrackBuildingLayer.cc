@@ -228,14 +228,14 @@ void TrackBuildingLayer::attach_segments(
         {108, 109, 110, 111, 112, 113, 114} // ME0
     };
 
+    std::vector<unsigned int> site_chamber_orders = {
+        0, 0, 2, 2, 2, 0, 0, 2, 2, 0, 1, 0
+    };
+
     std::vector<std::vector<int>> chamber_orders = {
         {-1, -1,  6, -1,  0,  1, -1,  2,  3, -1,  4,  5},
         { 3, -1, -1,  0, -1, -1,  1, -1, -1,  2, -1, -1},
         { 3, -1, 10,  0,  4,  5,  1,  6,  7,  2,  8,  9}
-    };
-
-    std::vector<unsigned int> site_chamber_orders = {
-        0, 0, 2, 2, 2, 0, 0, 2, 2, 0, 1, 0
     };
 
     for (int i_row = 0; i_row < n_rows; ++i_row) { // Begin loop rows
@@ -265,8 +265,8 @@ void TrackBuildingLayer::attach_segments(
             auto& site_min_phi_diff = trk_seg_phi_diff[site_id];
 
             const auto& s_chambers = site_chambers[site_id];
-            const auto& s_chamber_order_option = site_chamber_orders[site_id];
-            const auto& s_chamber_order = chamber_orders[s_chamber_order_option];
+            const auto& s_chamber_order_id = site_chamber_orders[site_id];
+            const auto& s_chamber_order = chamber_orders[s_chamber_order_id];
 
             for (const auto& chamber_idx : s_chamber_order) { // Begin loop chambers in site
 

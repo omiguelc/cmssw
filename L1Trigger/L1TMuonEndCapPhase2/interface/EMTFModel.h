@@ -12,11 +12,6 @@ namespace emtf::phase2 {
 
     // Forward Declarations
     namespace model {
-
-        namespace sites {
-            struct site_t;
-        }
-
         namespace zones { 
             namespace hitmap {
                 struct chamber_t;
@@ -45,7 +40,6 @@ namespace emtf::phase2 {
         struct zone_t;
         struct feature_t;
 
-        typedef std::vector<sites::site_t> sites_t;
         typedef std::vector<theta_medians::group_t> theta_median_t;
         typedef std::vector<reduced_sites::reduced_site_t> reduced_sites_t;
     }
@@ -58,7 +52,6 @@ namespace emtf::phase2 {
 
             ~EMTFModel();
 
-            model::sites_t sites_;
             std::vector<model::zone_t> zones_;
             std::vector<model::feature_t> features_;
             std::vector<model::theta_median_t> theta_medians_;
@@ -70,16 +63,6 @@ namespace emtf::phase2 {
     };
 
     namespace model {
-
-        // Define Site Structs
-        namespace sites {
-            struct site_t {
-                site_id_t id;
-                std::vector<unsigned int> chambers;
-                std::vector<int> chamber_phi_order;
-            };
-        }
-
         // Define Zone Structs
         struct zone_t {
             zones::hitmap_t hitmap;

@@ -15,17 +15,5 @@
 #define emtf_assert(expr) ((void)(expr))
 #endif
 
-namespace emtf::phase2::debug {
-
-    void dump_fw_raw_input(
-            const EMTFHitCollection& out_hits,
-            const EMTFTrackCollection& out_tracks);
-
-    void print_debug_info_header(const std::string&);
-
-    void print_debug_info_footer(const std::string&);
-
-}
-
 #endif // namespace L1Trigger_L1TMuonEndCapPhase2_DebugUtils_h
 

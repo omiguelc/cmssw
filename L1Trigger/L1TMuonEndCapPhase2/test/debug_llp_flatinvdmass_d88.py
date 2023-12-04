@@ -5,9 +5,9 @@
 # with command line options: EMTFTools/ParticleGuns/python/SingleMuon_PosEnd_2GeV_cfi.py -n 1000 -s GEN,SIM,DIGI,L1TrackTrigger,L1 --nThreads 16 --conditions auto:phase2_realistic --era Phase2C9 --geometry Extended2026D49 --fileout file:SingleMuon_Endcap.root --eventcontent FEVTDEBUGHLT --pileup NoPileUp --beamspot HLLHC14TeV --datatier GEN-SIM-DIGI-RAW --customise SimGeneral/MixingModule/customiseStoredTPConfig.higherPtTP,SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000,L1Trigger/Configuration/customisePhase2TTOn110.customisePhase2TTOn110,L1Trigger/L1TMuonEndCapPhase2/config.customise_mc,EMTFTools/NtupleMaker/config.customise_ntuple --python_filename pset_SingleMuon_PosEnd_2GeV.py --no_exec --mc
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Era_Phase2C9_cff import Phase2C9
+from Configuration.Eras.Era_Phase2C17I13M9_cff import Phase2C17I13M9
 
-process = cms.Process('L1',Phase2C9)
+process = cms.Process('L1',Phase2C17I13M9)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -15,8 +15,8 @@ process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('SimGeneral.MixingModule.mixNoPU_cfi')
-process.load('Configuration.Geometry.GeometryExtended2026D49Reco_cff')
-process.load('Configuration.Geometry.GeometryExtended2026D49_cff')
+process.load('Configuration.Geometry.GeometryExtended2026D88Reco_cff')
+process.load('Configuration.Geometry.GeometryExtended2026D88_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.Generator_cff')
 process.load('IOMC.EventVertexGenerators.VtxSmearedHLLHC14TeV_cfi')
@@ -108,6 +108,7 @@ process.generator = cms.EDProducer("FlatRandomLLPGunProducer2",
         MinEta = cms.double(1e-6),
         MaxPhi = cms.double(3.141592653589793),
         MinPhi = cms.double(-3.141592653589793),
+        LLPMassSpectrum = cms.string('flatInvDMass'),
         PartID = cms.vint32(-13),
     ),
     Verbosity = cms.untracked.int32(0),

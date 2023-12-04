@@ -50,7 +50,7 @@ void ME0TPConverter::convert(
     const int tp_station = tp_info.station;
     const int tp_ring = tp_info.ring;
     const int tp_layer = tp_info.layer;
-    const int tp_chamber = tp_info.chamber;
+    // const int tp_chamber = tp_info.chamber;
 
     const int tp_csc_id = tp_info.csc_id;
     const auto tp_csc_facing = tp_info.csc_facing;

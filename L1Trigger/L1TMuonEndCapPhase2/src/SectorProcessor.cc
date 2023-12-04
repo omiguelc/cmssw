@@ -20,7 +20,6 @@
 #include "L1Trigger/L1TMuonEndCapPhase2/interface/DAQ/TPConverters.h"
 #include "L1Trigger/L1TMuonEndCapPhase2/interface/DAQ/TPSelectors.h"
 #include "L1Trigger/L1TMuonEndCapPhase2/interface/DAQ/TPrimitives.h"
-#include "L1Trigger/L1TMuonEndCapPhase2/interface/Tensors/NdArrayDesc.h"
 #include "L1Trigger/L1TMuonEndCapPhase2/interface/Utils/DebugUtils.h"
 #include "L1Trigger/L1TMuonEndCapPhase2/interface/Utils/CSCUtils.h"
 
