@@ -25,3 +25,6 @@ phase2_muon.toModify(simCscTriggerPrimitiveDigisForEMTF,
                                         runME41Up = cms.bool(True),
                                         enableAlctPhase2 = cms.bool(False)))  # was: True
 
+# Allow CSCs to have hits in multiple bxs - (Needs to be fixed on their end eventually)
+phase2_muon.toModify(simCscTriggerPrimitiveDigisForEMTF.tmbPhase1, tmbReadoutEarliest2 = False)
+phase2_muon.toModify(simCscTriggerPrimitiveDigisForEMTF.tmbPhase2, tmbReadoutEarliest2 = False)
