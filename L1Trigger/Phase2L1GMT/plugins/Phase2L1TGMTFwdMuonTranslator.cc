@@ -225,7 +225,7 @@ SAMuon Phase2L1TGMTFwdMuonTranslator::ConvertEMTFTrack(const l1t::phase2::EMTFTr
   float track_phi = emtf::phase2::tp::calc_phi_glob_rad_from_loc(
       track.sector(), emtf::phase2::tp::calc_phi_loc_deg_from_int(track.modelPhi()));
   float track_theta = emtf::phase2::tp::calc_theta_rad_from_int(track.modelEta());
-  float track_eta = -std::log(std::tan(track_theta / 2));
+  float track_eta = -1 * track.endcap() * std::log(std::tan(track_theta / 2));
 
   // Calculate Lorentz Vector
   // Muon mass taken from L1Trigger/L1TMuon/plugins/L1TMuonProducer.cc
