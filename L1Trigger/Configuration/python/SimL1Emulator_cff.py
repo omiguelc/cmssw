@@ -140,14 +140,16 @@ _phase2_siml1emulator.add(l1tVertexFinderEmulator)
 # Emulated GMT Muons (Tk + Stub, Tk + MuonTFT, StandaloneMuon)
 # ########################################################################
 from L1Trigger.Phase2L1GMT.gmt_cfi  import *
-l1tTkStubsGmt = gmtStubs.clone()
+l1tStubsGmt = gmtStubs.clone()
 l1tKMTFMuonsGmt = gmtKMTFMuons.clone()
-l1tFwdMuonsGmt = gmtFwdMuons.clone()
+l1tFwdMuonsGmt = gmtFwdMuons.clone(
+    stubs  = 'l1tStubsGmt:tps'
+)
 l1tSAMuonsGmt = gmtSAMuons.clone()
 l1tTkMuonsGmt = gmtTkMuons.clone(
-    srcStubs  = 'l1tTkStubsGmt'
+    srcStubs  = 'l1tStubsGmt:tps'
 )
-_phase2_siml1emulator.add( l1tTkStubsGmt )
+_phase2_siml1emulator.add( l1tStubsGmt )
 _phase2_siml1emulator.add( l1tKMTFMuonsGmt )
 _phase2_siml1emulator.add( l1tFwdMuonsGmt )
 _phase2_siml1emulator.add( l1tSAMuonsGmt )
