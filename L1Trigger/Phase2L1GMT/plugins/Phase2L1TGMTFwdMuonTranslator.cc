@@ -104,6 +104,13 @@ void Phase2L1TGMTFwdMuonTranslator::produce(edm::Event& iEvent, const edm::Event
     if (samuon.tfType() == l1t::tftype::bmtf)
       continue;
 
+    // Short-Circuit: Ignore muons from Run-3 EMTF
+    if (samuon.tfType() == l1t::tftype::emtf_pos)
+      continue;
+
+    if (samuon.tfType() == l1t::tftype::emtf_neg)
+      continue;
+
     //now associate the stubs
     associateStubs(samuon, stubs);
     prompt.push_back(samuon);
@@ -225,7 +232,10 @@ SAMuon Phase2L1TGMTFwdMuonTranslator::ConvertEMTFTrack(const l1t::phase2::EMTFTr
   float track_phi = emtf::phase2::tp::calc_phi_glob_rad_from_loc(
       track.sector(), emtf::phase2::tp::calc_phi_loc_deg_from_int(track.modelPhi()));
   float track_theta = emtf::phase2::tp::calc_theta_rad_from_int(track.modelEta());
-  float track_eta = -1 * track.endcap() * std::log(std::tan(track_theta / 2));
+  float track_eta = -1 * std::log(std::tan(track_theta / 2));
+
+  track_theta *= track.endcap(); 
+  track_eta *= track.endcap(); 
 
   // Calculate Lorentz Vector
   // Muon mass taken from L1Trigger/L1TMuon/plugins/L1TMuonProducer.cc
