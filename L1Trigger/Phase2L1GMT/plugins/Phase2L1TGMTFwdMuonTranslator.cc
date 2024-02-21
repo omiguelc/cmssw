@@ -228,13 +228,9 @@ SAMuon Phase2L1TGMTFwdMuonTranslator::ConvertEMTFTrack(const l1t::phase2::EMTFTr
   // Convert EMTF Phi and Theta to Global Phi and Eta
   float track_phi = emtf::phase2::tp::calc_phi_glob_rad_from_loc(
         track.sector(),
-        emtf::phase2::tp::calc_phi_loc_deg_from_int(
-          track.modelPhi()
-        )
+        emtf::phase2::tp::calc_phi_loc_deg_from_int(track.modelPhi())
   );
-  float track_theta = emtf::phase2::tp::calc_theta_rad_from_int(
-        track.modelEta()
-  );
+  float track_theta = emtf::phase2::tp::calc_theta_rad_from_int(track.modelEta());
   float track_eta = - std::log(std::tan(track_theta / 2));
 
   // Calculate Lorentz Vector

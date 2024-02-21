@@ -133,7 +133,7 @@ process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
 
-# EMTF Stuff
+# EMTF++ Step
 process.load('L1Trigger.L1TMuonEndCapPhase2.simCscTriggerPrimitiveDigisForEMTF_cfi')
 process.load('L1Trigger.L1TMuonEndCapPhase2.rpcRecHitsForEMTF_cfi')
 process.load('L1Trigger.L1TMuonEndCapPhase2.simEmtfDigisPhase2_cfi')
