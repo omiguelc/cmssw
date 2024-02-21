@@ -232,9 +232,9 @@ SAMuon Phase2L1TGMTFwdMuonTranslator::ConvertEMTFTrack(const l1t::phase2::EMTFTr
   math::PtEtaPhiMLorentzVector p4(track.emtfPt() * LSBpt, track_eta, track_phi, 0.0);
 
   // Quantize Values
-  ap_uint<BITSSAQUAL> qual = track.emtfModeV2;  // Not sure how this should be handled; using mode for now
-  int charge = track.emtfQ();                   // EMTF uses the same convention
-  ap_uint<BITSPT> pt = track.emtfPt();          // Quantized by EMTF in the same units
+  ap_uint<BITSSAQUAL> qual = track.emtfModeV2();  // Not sure how this should be handled; using mode for now
+  int charge = track.emtfQ();                     // EMTF uses the same convention
+  ap_uint<BITSPT> pt = track.emtfPt();            // Quantized by EMTF in the same units
   ap_int<BITSPHI> phi = round(track_phi / LSBphi);
   ap_int<BITSETA> eta = round(track_theta / LSBeta);
   ap_int<BITSSAZ0> z0 = track.emtfZ0();  // Quantized by EMTF in the same units
