@@ -36,6 +36,9 @@ upgradeKeys[2017] = [
     '2022HIRP', #RawPrime
     '2023HI',
     '2023HIRP', #RawPrime
+    '2024HLTOnDigi',
+    '2024HLTOnDigiPU'
+
 ]
 
 upgradeKeys[2026] = [
@@ -89,6 +92,8 @@ upgradeKeys[2026] = [
     '2026D112PU',
     '2026D113',
     '2026D113PU',
+    '2026D114',
+    '2026D114PU'
 ]
 
 # pre-generation of WF numbers
@@ -198,8 +203,10 @@ upgradeWFs['baseline'] = UpgradeWorkflow_baseline(
         'GenSimHLBeamSpot14',
         'GenSimHLBeamSpotHGCALCloseBy',
         'Digi',
+        'DigiNoHLT',
         'DigiTrigger',
         'HLTRun3',
+        'HLTOnly',
         'RecoLocal',
         'Reco',
         'RecoFakeHLT',
@@ -226,6 +233,8 @@ upgradeWFs['baseline'] = UpgradeWorkflow_baseline(
         'RecoLocal',
         'RecoGlobal',
         'Digi',
+        'DigiNoHLT',
+        'HLTOnly',
         'Reco',
         'RecoFakeHLT',
         'RecoNano',
@@ -253,7 +262,7 @@ class UpgradeWorkflow_DigiNoHLT(UpgradeWorkflow):
                 stepDict[stepName][k] = None
             if 'RecoNano' in step:
                 stepDict[stepName][k] = merge([{'--filein': 'file:step3.root', '--secondfilein': 'file:step2.root'}, stepDict[step][k]])
-            if 'Digi' in step:
+            if 'Digi' in step and 'NoHLT' not in step:
                 stepDict[stepName][k] = merge([{'-s': re.sub(',HLT.*', '', stepDict[step][k]['-s'])}, stepDict[step][k]])
     def condition(self, fragment, stepList, key, hasHarvest):
         if ('TTbar_14TeV' in fragment and '2021' == key):
@@ -428,13 +437,14 @@ upgradeWFs['pixelTrackingOnly'].step3 = {
 
 class UpgradeWorkflow_trackingMkFit(UpgradeWorkflowTracking):
     def setup__(self, step, stepName, stepDict, k, properties):
-        if 'Digi' in step: stepDict[stepName][k] = merge([self.step2, stepDict[step][k]])
+        if ('Digi' in step and 'NoHLT' not in step) or ('HLTOnly' in step): stepDict[stepName][k] = merge([self.step2, stepDict[step][k]])
         if 'Reco' in step: stepDict[stepName][k] = merge([self.step3, stepDict[step][k]])
     def condition_(self, fragment, stepList, key, hasHarvest):
         return ('2017' in key or '2021' in key or '2023' in key or '2024' in key) and ('FS' not in key)
 upgradeWFs['trackingMkFit'] = UpgradeWorkflow_trackingMkFit(
     steps = [
         'Digi',
+        'HLTOnly',
         'DigiTrigger',
         'Reco',
         'RecoFakeHLT',
@@ -826,6 +836,7 @@ class PatatrackWorkflow(UpgradeWorkflow):
         super(PatatrackWorkflow, self).__init__(
             steps = [
                 'Digi',
+                'HLTOnly',
                 'DigiTrigger',
                 'Reco',
                 'RecoFakeHLT',
@@ -844,6 +855,7 @@ class PatatrackWorkflow(UpgradeWorkflow):
             ],
             PU = [
                 'Digi',
+                'HLTOnly',
                 'DigiTrigger',
                 'Reco',
                 'RecoFakeHLT',
@@ -887,7 +899,7 @@ class PatatrackWorkflow(UpgradeWorkflow):
         # skip ALCA and Nano steps (but not RecoNano or HARVESTNano for Run3)
         if 'ALCA' in step or 'Nano'==step:
             stepDict[stepName][k] = None
-        elif 'Digi' in step:
+        elif ('Digi' in step and "NoHLT" not in step) or 'HLTOnly' in step:
             if self.__digi is None:
               stepDict[stepName][k] = None
             else:
@@ -1922,7 +1934,7 @@ upgradeWFs['HLTwDIGI75e33'] = UpgradeWorkflow_HLTwDIGI75e33(
 
 class UpgradeWorkflow_L1Complete(UpgradeWorkflow):
     def setup_(self, step, stepName, stepDict, k, properties):
-        if 'Digi' in step:
+        if 'Digi' in step and 'NoHLT' not in step:
             stepDict[stepName][k] = merge([{'-s': 'DIGI:pdigi_valid,L1,L1TrackTrigger,L1P2GT,DIGI2RAW,HLT:@relval2026'}, stepDict[step][k]])
     def condition(self, fragment, stepList, key, hasHarvest):
         return '2026' in key
@@ -2087,7 +2099,7 @@ class UpgradeWorkflow_ECalComponent(UpgradeWorkflow):
         if 'Sim' in step:
             if self.__ecalMod is not None:
                 stepDict[stepName][k] = merge([{'--procModifiers':self.__ecalMod},stepDict[step][k]])
-        if 'Digi' in step:
+        if 'Digi' in step and 'NoHLT' not in step:
             if self.__ecalMod is not None:
                 stepDict[stepName][k] = merge([{'--procModifiers':self.__ecalMod},stepDict[step][k]])
             if self.__ecalTPPh2 is not None:
@@ -2858,6 +2870,14 @@ upgradeProperties[2017] = {
         'BeamSpot': 'DBrealistic',
         'ScenToRun' : ['GenSim','Digi','RecoNano','HARVESTNano','ALCA'],
     },
+    '2024HLTOnDigi' : {
+        'Geom' : 'DB:Extended',
+        'GT' : 'auto:phase1_2024_realistic',
+        'HLTmenu': '@relval2024',
+        'Era' : 'Run3',
+        'BeamSpot': 'DBrealistic',
+        'ScenToRun' : ['GenSim','DigiNoHLT','HLTOnly','RecoNano','HARVESTNano','ALCA'],
+    },
     '2021FS' : {
         'Geom' : 'DB:Extended',
         'GT' : 'auto:phase1_2022_realistic',
@@ -3104,6 +3124,13 @@ upgradeProperties[2026] = {
         'HLTmenu': '@relval2026',
         'GT' : 'auto:phase2_realistic_T38',
         'Era' : 'Phase2C22I13M9',
+        'ScenToRun' : ['GenSimHLBeamSpot','DigiTrigger','RecoGlobal', 'HARVESTGlobal', 'ALCAPhase2'],
+    },
+    '2026D114' : {
+        'Geom' : 'Extended2026D114',
+        'HLTmenu': '@relval2026',
+        'GT' : 'auto:phase2_realistic_T33',
+        'Era' : 'Phase2C17I13M9',
         'ScenToRun' : ['GenSimHLBeamSpot','DigiTrigger','RecoGlobal', 'HARVESTGlobal', 'ALCAPhase2'],
     },
 }
