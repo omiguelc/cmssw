@@ -33,8 +33,8 @@ namespace emtf::phase2 {
 
     // Processing
     int proc_bx_;
-    std::vector<EMTFHitCollection> bx_window_hits_;
-    std::map<SubsystemType, ILinkTPCMap> bx_ilink_tpc_maps_;
+    std::vector<EMTFHitCollection> hcol_buffer_;
+    std::map<SubsystemType, ILinkTPCMap> subsystem_ilink_tpc_maps_;
 
     // Helper functions
     void copyTP(const ILinkTPCMap& source, ILinkTPCMap& target) const;

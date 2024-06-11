@@ -68,22 +68,22 @@ void SectorProcessor::configureEvent(const edm::Event& event) {
   proc_bx_ = -999;
 
   // Reset Window Hits
-  bx_window_hits_.clear();
-  bx_ilink_tpc_maps_.clear();
+  hcol_buffer_.clear();
+  subsystem_ilink_tpc_maps_.clear();
 }
 
 void SectorProcessor::configureBx(const int& input_bx) {
   // Reset BX Maps
-  bx_ilink_tpc_maps_.clear();
+  subsystem_ilink_tpc_maps_.clear();
 
   // Remove BX TPCollections that aren't in the bx window
-  // Note that the first entry in bx_window_hits is the earliest BX
+  // Note that the first entry in hcol_buffer_ is the earliest BX
   const auto min_bx = this->context_.config_.min_bx_;
   const auto delay_bx = this->context_.config_.bx_window_ - 1;
   const auto start_bx = min_bx + delay_bx;
 
   if (start_bx < input_bx) {
-    bx_window_hits_.erase(bx_window_hits_.begin());
+    hcol_buffer_.erase(hcol_buffer_.begin());
   }
 
   // BX
@@ -103,8 +103,8 @@ void SectorProcessor::select(const TriggerPrimitive& tp, const TPInfo& tp_info) 
   }
 
   // Select TP that belongs to this Sector Processor
-  auto& bx_ilink_tpc_map = bx_ilink_tpc_maps_[tp_subsystem];  // reference to subsystem trigger primitive collection
-  tp_selectors_it->second->select(tp, tp_info, bx_ilink_tpc_map);
+  auto& subsystem_ilink_tpc_map = subsystem_ilink_tpc_maps_[tp_subsystem];  // reference to subsystem trigger primitive collection
+  tp_selectors_it->second->select(tp, tp_info, subsystem_ilink_tpc_map);
 }
 
 void SectorProcessor::process(EMTFHitCollection& out_hits,
@@ -115,30 +115,30 @@ void SectorProcessor::process(EMTFHitCollection& out_hits,
   // ===========================================================================
   ILinkTPCMap bx_ilink_tpc_map;
 
-  for (auto& [subsystem, ilink_tpc_map] : bx_ilink_tpc_maps_) {
+  for (auto& [subsystem, ilink_tpc_map] : subsystem_ilink_tpc_maps_) {
     copyTP(ilink_tpc_map, bx_ilink_tpc_map);
   }
 
   // Free memory
-  bx_ilink_tpc_maps_.clear();
+  subsystem_ilink_tpc_maps_.clear();
 
   // ===========================================================================
   // Convert trigger primitives to EMTF Hits
   // ===========================================================================
 
   // Convert tp into hits
-  EMTFHitCollection bx_hits;
+  EMTFHitCollection bx_hcol;
 
-  convertTP(out_hits.size(), bx_ilink_tpc_map, bx_hits);
+  convertTP(out_hits.size(), bx_ilink_tpc_map, bx_hcol);
 
   // Append to bx window hits
-  bx_window_hits_.push_back(bx_hits);
+  hcol_buffer_.push_back(bx_hcol);
 
   // Free memory
   bx_ilink_tpc_map.clear();
 
   // Record hits
-  out_hits.insert(out_hits.end(), bx_hits.begin(), bx_hits.end());
+  out_hits.insert(out_hits.end(), bx_hcol.begin(), bx_hcol.end());
 
   // ===========================================================================
   // Process tracks between MIN_BX and MAX_BX
@@ -160,7 +160,7 @@ void SectorProcessor::process(EMTFHitCollection& out_hits,
   // Convert bx window hits into segments
   segment_collection_t segments;
 
-  populateSegments(bx_window_hits_, seg_to_hit, segments);
+  populateSegments(hcol_buffer_, seg_to_hit, segments);
 
   // Build Tracks
   buildTracks(seg_to_hit, segments, false, out_tracks);  // With prompt setup
@@ -266,7 +266,7 @@ void SectorProcessor::convertTP(const int& initial_hit_id, const ILinkTPCMap& il
   }
 }
 
-void SectorProcessor::populateSegments(const std::vector<EMTFHitCollection>& bx_window_hits,
+void SectorProcessor::populateSegments(const std::vector<EMTFHitCollection>& bx_window_hcol_buffer,
                                        std::map<int, int>& seg_to_hit,
                                        segment_collection_t& segments) {
   // Initialize
@@ -290,10 +290,10 @@ void SectorProcessor::populateSegments(const std::vector<EMTFHitCollection>& bx_
   // Loop hit collections from earliest to latest BX
   std::map<int, unsigned int> bx_window_ch_seg;
 
-  for (const auto& bx_hits : bx_window_hits) {
+  for (const auto& bx_hcol : bx_window_hcol_buffer) {
     std::map<int, unsigned int> bx_ch_seg;
 
-    for (const auto& hit : bx_hits) {  // Begin loop hits in BX
+    for (const auto& hit : bx_hcol) {  // Begin loop hits in BX
       // Unpack Hit
       const auto& hit_chamber = hit.emtfChamber();
       const auto& hit_segment = hit.emtfSegment();
