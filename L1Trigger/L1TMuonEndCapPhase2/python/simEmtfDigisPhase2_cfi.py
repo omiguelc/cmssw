@@ -36,7 +36,7 @@ simEmtfDigisMCPhase2 = cms.EDProducer(
     # BX
     MinBX    = cms.int32(-2), # Minimum BX considered
     MaxBX    = cms.int32(2), # Maximum BX considered
-    BXWindow = cms.int32(1),  # Number of BX whose primitives can be included in the same track
+    BXWindow = cms.int32(2),  # Number of BX whose primitives can be included in the same track
 
     CSCInputBXShift = cms.int32(-8), # Shift applied to input CSC LCT primitives, to center at BX = 0
     RPCInputBXShift = cms.int32(0),
