@@ -23,15 +23,16 @@ namespace emtf::phase2 {
   private:
     const EMTFContext& context_;
 
+    // Processor
     int endcap_, sector_;
     std::map<SubsystemType, std::unique_ptr<TPSelector>> tp_selectors_;
     std::map<SubsystemType, std::unique_ptr<TPConverter>> tp_converters_;
 
     // Event
     const edm::Event* event_;
-    const int* bx_;
 
-    // Buffers
+    // Processing
+    int proc_bx_;
     std::vector<EMTFHitCollection> bx_window_hits_;
     std::map<SubsystemType, ILinkTPCMap> bx_ilink_tpc_maps_;
 
