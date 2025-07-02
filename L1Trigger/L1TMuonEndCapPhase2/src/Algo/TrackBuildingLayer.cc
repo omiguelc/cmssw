@@ -150,17 +150,20 @@ void TrackBuildingLayer::attachSegmentsByPhi(const segment_collection_t& segment
   // Unpack model
   // ---------------------------------------------------------------------------
   const auto& model = context_.model_;
-  const auto& model_hm = model.zones_[track.zone].hitmap;
-
+  const model::zones::hitmap_t* model_hm;
   const model::zones::pattern_t* model_pat;
 
   if (algo == algo_id_t::kPrompt) {
+    model_hm = &(model.zones_[track.zone].hitmap);
     model_pat = &(model.zones_[track.zone].prompt_patterns[track.pattern]);
   } else if (algo == algo_id_t::kDisplaced) {
+    model_hm = &(model.zones_[track.zone].hitmap);
     model_pat = &(model.zones_[track.zone].disp_patterns[track.pattern]);
   } else if (algo == algo_id_t::kBeamHalo) {
+    model_hm = &(model.bh_zones_[track.zone].hitmap);
     model_pat = &(model.bh_zones_[track.zone].patterns[track.pattern]);
   } else {
+    model_hm = nullptr;
     model_pat = nullptr;
   }
 
@@ -240,9 +243,9 @@ void TrackBuildingLayer::attachSegmentsByPhi(const segment_collection_t& segment
   // Select segments
   int zone_mask = (1u << track.zone);
 
-  for (unsigned int i_row = 0; i_row < model_hm.size(); ++i_row) {  // Begin loop rows
+  for (unsigned int i_row = 0; i_row < model_hm->size(); ++i_row) {  // Begin loop rows
 
-    const auto& model_hm_row = model_hm[i_row];
+    const auto& model_hm_row = (*model_hm)[i_row];
 
     const auto& trk_pat_row_begin = trk_pat_begin[i_row];
     const auto& trk_pat_row_end = trk_pat_end[i_row];
