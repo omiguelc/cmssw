@@ -43,7 +43,9 @@ namespace emtf::phase2 {
 
     void populateSegments(const std::vector<EMTFHitCollection>&, std::map<int, int>&, segment_collection_t&);
 
-    void buildTracks(const std::map<int, int>&, const segment_collection_t&, const bool&, EMTFTrackCollection&);
+    void buildTracks(const std::map<int, int>&, const segment_collection_t&, const algo_id_t&, EMTFTrackCollection&);
+
+    void buildBeamHaloTracks(const std::map<int, int>&, const segment_collection_t&, EMTFTrackCollection&);
   };
 
 }  // namespace emtf::phase2

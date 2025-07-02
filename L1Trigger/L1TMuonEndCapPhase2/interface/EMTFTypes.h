@@ -34,8 +34,8 @@ namespace emtf::phase2 {
   typedef l1t::phase2::EMTFInput EMTFInput;
   typedef l1t::phase2::EMTFInputCollection EMTFInputCollection;
 
-  // General
-  typedef ap_uint<1> flag_t;
+  // Algo
+  enum class algo_id_t { kPrompt = 0, kDisplaced = 1, kBeamHalo = 2, size, begin = 0, end = size };
 
   // Segments
   enum class site_id_t {
@@ -65,6 +65,7 @@ namespace emtf::phase2 {
   typedef ap_uint<13> seg_phi_t;
   typedef ap_int<10> seg_bend_t;
   typedef ap_uint<8> seg_theta_t;
+  typedef ap_uint<8> seg_rho_t;
   typedef ap_uint<4> seg_qual_t;
   typedef ap_int<4> seg_time_t;
   typedef ap_uint<3> seg_zones_t;
@@ -92,6 +93,10 @@ namespace emtf::phase2 {
 
   typedef std::array<segment_t, v3::kNumSegments> segment_collection_t;
 
+  // Hitmaps
+  typedef ap_uint<v3::kHitmapNCols> hitmap_row_t;
+  typedef std::array<hitmap_row_t, v3::kHitmapNRows> hitmap_t;
+
   // Tracks
   typedef ap_uint<2> trk_zone_t;
   typedef ap_uint<2> trk_tzone_t;
@@ -104,8 +109,9 @@ namespace emtf::phase2 {
   typedef ap_uint<7> trk_rels_t;
   typedef ap_int<7> trk_dxy_t;
   typedef ap_int<5> trk_z0_t;
-  typedef ap_int<13> trk_phi_t;
-  typedef ap_int<13> trk_eta_t;
+  typedef seg_phi_t trk_phi_t;
+  typedef seg_theta_t trk_theta_t;
+  typedef seg_rho_t trk_rho_t;
   typedef ap_uint<4> trk_beta_t;
   typedef ap_uint<1> trk_valid_t;
   typedef ap_uint<8> trk_site_seg_t;
@@ -127,9 +133,9 @@ namespace emtf::phase2 {
     trk_rels_t rels;
     trk_dxy_t dxy;
     trk_z0_t z0;
-    seg_phi_t phi;
-    seg_theta_t theta;
-    trk_eta_t eta;
+    trk_phi_t phi;
+    trk_theta_t theta;
+    trk_rho_t rho;
     trk_beta_t beta;
     trk_valid_t valid;
     site_segs_t site_segs;
@@ -140,10 +146,6 @@ namespace emtf::phase2 {
     trk_nn_address_t rels_address;
     trk_nn_address_t dxy_address;
   };
-
-  // Hitmaps
-  typedef ap_uint<v3::kHitmapNCols> hitmap_row_t;
-  typedef std::array<hitmap_row_t, v3::kHitmapNRows> hitmap_t;
 
   // Roads
   struct road_t {

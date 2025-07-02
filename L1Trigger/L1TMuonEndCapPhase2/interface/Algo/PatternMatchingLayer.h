@@ -16,7 +16,7 @@ namespace emtf::phase2::algo {
 
     ~PatternMatchingLayer() = default;
 
-    void apply(const std::vector<hitmap_t>&, const bool&, std::vector<road_collection_t>&) const;
+    void apply(const std::vector<hitmap_t>&, const algo_id_t&, std::vector<road_collection_t>&) const;
 
   private:
     const EMTFContext& context_;

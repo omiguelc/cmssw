@@ -12,6 +12,7 @@ RoadSortingLayer::RoadSortingLayer(const EMTFContext& context) : context_(contex
 
 void RoadSortingLayer::apply(const unsigned int& first_n,
                              const std::vector<road_collection_t>& zone_roads,
+                             const algo_id_t& algo,
                              std::vector<road_t>& best_roads) const {
   // Find the best roads from each zone
   std::vector<road_t> top_roads;
@@ -97,8 +98,8 @@ void RoadSortingLayer::apply(const unsigned int& first_n,
         roads_kept, 32, 16, [](const road_t& lhs, const road_t& rhs) -> int { return lhs.quality < rhs.quality; });
 
     // Shift everything 16 cols to the left
-    for (unsigned int i = 16; i < (keep_n_roads - 16); ++i) {
-      roads_kept[i] = roads_kept[i + 16];
+    for (unsigned int i_col = 16; i_col < (keep_n_roads - 16); ++i_col) {
+      roads_kept[i_col] = roads_kept[i_col + 16];
     }
 
     // Merge-sort the remaining 128 cols
@@ -128,19 +129,21 @@ void RoadSortingLayer::apply(const unsigned int& first_n,
 
   // Mergesort-reduce to n best roads
   // This will sort descending order (higher-value means lower-index) and keep the first n roads
+  if (algo != algo_id_t::kBeamHalo) {
+    // Sort the first 8 cols since there are 12 cols and we wish to sort powers of 2, therefore 8 to keep priorities
+    data::mergesort(
+        &top_roads[0], 8, 4, [](const road_t& lhs, const road_t& rhs) -> int { return lhs.quality < rhs.quality; });
 
-  // Sort the first 8 cols since there are 12 cols and we wish to sort powers of 2, therefore 8 to keep priorities
-  data::mergesort(
-      &top_roads[0], 8, 4, [](const road_t& lhs, const road_t& rhs) -> int { return lhs.quality < rhs.quality; });
+    // Shift everything 4 cols to the left
+    for (unsigned int i_col = 4; i_col < (top_roads.size() - 4); ++i_col) {
+      top_roads[i_col] = top_roads[i_col + 4];
+    }
 
-  // Shift everything 4 cols to the left
-  for (unsigned int i = 4; i < top_roads.size(); ++i) {
-    top_roads[i] = top_roads[i + 4];
+    // Merge-sort remaining 8 cols
+    data::mergesort(&top_roads[0], 8, first_n, [](const road_t& lhs, const road_t& rhs) -> int {
+      return lhs.quality < rhs.quality;
+    });
   }
-
-  // Merge-sort remaining 8 cols
-  data::mergesort(
-      &top_roads[0], 8, first_n, [](const road_t& lhs, const road_t& rhs) -> int { return lhs.quality < rhs.quality; });
 
   // Collect best roads
   for (unsigned int i_road = 0; i_road < first_n; ++i_road) {

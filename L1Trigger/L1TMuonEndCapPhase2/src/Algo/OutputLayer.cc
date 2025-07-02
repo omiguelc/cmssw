@@ -16,7 +16,7 @@ void OutputLayer::apply(const int& endcap,
                         const int& bx,
                         const std::map<int, int>& seg_to_hit,
                         const std::vector<track_t>& tracks,
-                        const bool& displaced_en,
+                        const algo_id_t& algo,
                         EMTFTrackCollection& out_tracks) const {
   const int endcap_pm = (endcap == 2) ? -1 : endcap;  // 1: +endcap, -1: -endcap
 
@@ -77,7 +77,8 @@ void OutputLayer::apply(const int& endcap,
     out_trk.setEndcap(endcap_pm);
     out_trk.setSector(sector);
     out_trk.setBx(bx);
-    out_trk.setUnconstrained(displaced_en ? true : false);
+    out_trk.setUnconstrained((algo == algo_id_t::kDisplaced) ? true : false);
+    out_trk.setAlgo(static_cast<int16_t>(algo));
     out_trk.setValid(track.valid);
 
     out_trk.setModelPtAddress(track.pt_address);
@@ -87,6 +88,7 @@ void OutputLayer::apply(const int& endcap,
     out_trk.setModelQual(track.quality);
     out_trk.setModelPhi(track.phi);
     out_trk.setModelEta(track.theta);
+    out_trk.setModelRho(track.rho);
     out_trk.setModelFeatures(model_features);
 
     out_trk.setEmtfQ(track.q);

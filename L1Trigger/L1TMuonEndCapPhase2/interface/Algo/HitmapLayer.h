@@ -12,7 +12,7 @@ namespace emtf::phase2::algo {
 
     ~HitmapLayer() = default;
 
-    void apply(const segment_collection_t&, std::vector<hitmap_t>&) const;
+    void apply(const segment_collection_t&, const algo_id_t&, std::vector<hitmap_t>&) const;
 
   private:
     const EMTFContext& context_;

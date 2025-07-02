@@ -10,7 +10,7 @@ using namespace emtf::phase2::algo;
 PatternMatchingLayer::PatternMatchingLayer(const EMTFContext& context) : context_(context) {}
 
 void PatternMatchingLayer::apply(const std::vector<hitmap_t>& zone_hitmaps,
-                                 const bool& displaced_en,
+                                 const algo_id_t& algo,
                                  std::vector<road_collection_t>& zone_roads) const {
   typedef ap_uint<v3::kHitmapNCols + v3::kPatternMatchingPadding * 2> padded_row_t;
   typedef ap_uint<v3::kHitmapNRows> pattern_activation_t;
@@ -21,13 +21,20 @@ void PatternMatchingLayer::apply(const std::vector<hitmap_t>& zone_hitmaps,
   auto& model = context_.model_;
 
   for (unsigned int i_zone = 0; i_zone < zone_hitmaps.size(); ++i_zone) {  // Loop Zones
-    auto& hitmap = zone_hitmaps[i_zone];
-    auto* model_pc = &(model.zones_[i_zone].prompt_patterns);
-    auto* model_ql = &(model.zones_[i_zone].prompt_quality_lut);
+    const std::vector<model::zones::pattern_t>* model_pc = nullptr;
+    const model::zones::quality_lut_t* model_ql = nullptr;
 
-    if (displaced_en) {
+    auto& hitmap = zone_hitmaps[i_zone];
+
+    if (algo == algo_id_t::kPrompt) {
+      model_pc = &(model.zones_[i_zone].prompt_patterns);
+      model_ql = &(model.zones_[i_zone].prompt_quality_lut);
+    } else if (algo == algo_id_t::kDisplaced) {
       model_pc = &(model.zones_[i_zone].disp_patterns);
       model_ql = &(model.zones_[i_zone].disp_quality_lut);
+    } else if (algo == algo_id_t::kBeamHalo) {
+      model_pc = &(model.bh_zones_[i_zone].patterns);
+      model_ql = &(model.bh_zones_[i_zone].quality_lut);
     }
 
     // Initialize roads

@@ -21,12 +21,16 @@ namespace emtf::phase2::algo {
 
     ~TrackBuildingLayer() = default;
 
-    void apply(const segment_collection_t&, const std::vector<road_t>&, const bool&, std::vector<track_t>&) const;
+    void apply(const segment_collection_t&, const std::vector<road_t>&, const algo_id_t&, std::vector<track_t>&) const;
 
   private:
     const EMTFContext& context_;
 
-    void attachSegments(const segment_collection_t&, const road_t&, const bool&, track_t&) const;
+    void attachSegmentsByPhi(const segment_collection_t&, const road_t&, const algo_id_t&, track_t&) const;
+
+    void attachSegmentsByTheta(const segment_collection_t&, const algo_id_t&, track_t&) const;
+
+    void attachSegmentsByRadius(const segment_collection_t&, const algo_id_t&, track_t&) const;
   };
 
 }  // namespace emtf::phase2::algo

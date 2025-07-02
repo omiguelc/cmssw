@@ -9,27 +9,42 @@ using namespace emtf::phase2::algo;
 
 HitmapLayer::HitmapLayer(const EMTFContext& context) : context_(context) {}
 
-void HitmapLayer::apply(const segment_collection_t& segments, std::vector<hitmap_t>& zone_hitmaps) const {
+void HitmapLayer::apply(const segment_collection_t& segments,
+                        const algo_id_t& algo,
+                        std::vector<hitmap_t>& zone_hitmaps) const {
   const hitmap_row_t padded_one = 1;
 
   auto& model = context_.model_;
 
   // Create Images
-  auto n_zones = model.zones_.size();
+  unsigned int n_zones;
+
+  if (algo == algo_id_t::kBeamHalo) {
+    n_zones = model.bh_zones_.size();
+  } else {
+    n_zones = model.zones_.size();
+  }
 
   for (unsigned int zone_id = 0; zone_id < n_zones; ++zone_id) {  // Begin zones
     unsigned int zone_mask = (1u << zone_id);
     unsigned int tzone_mask = (1u << 0);  // Only looking at BX=0 for now
 
-    const auto& model_hm = model.zones_[zone_id].hitmap;
+    const model::zones::hitmap_t* model_hm_ptr;
+
+    if (algo == algo_id_t::kBeamHalo) {
+      model_hm_ptr = &model.bh_zones_[zone_id].hitmap;
+    } else {
+      model_hm_ptr = &model.zones_[zone_id].hitmap;
+    }
+
     auto& hitmap = zone_hitmaps.emplace_back();
     bool hitmap_is_blank = true;
 
-    auto n_rows = model_hm.size();
+    auto n_rows = model_hm_ptr->size();
 
     for (unsigned int row_id = 0; row_id < n_rows; ++row_id) {  // Begin loop rows
 
-      const auto& model_hm_row = model_hm[row_id];
+      const auto& model_hm_row = (*model_hm_ptr)[row_id];
       auto& row = hitmap[row_id];
       row = 0;  // Clear Row Image
 
@@ -47,30 +62,32 @@ void HitmapLayer::apply(const segment_collection_t& segments, std::vector<hitmap
               continue;
             }
 
-            // Short-Circuit: Must be same zone
-            if ((seg.zones & zone_mask) != zone_mask) {
-              // Debug Info
-              if (this->context_.config_.verbosity_ > 4) {
-                edm::LogInfo("L1TEMTFpp")
-                    << "Hitmap Segment not in zone: "
-                    << " zone " << zone_id << " row " << row_id << " seg_id " << seg_id << " seg_phi " << seg.phi
-                    << " seg_zones " << seg.zones << " seg_tzones " << seg.tzones << std::endl;
+            if (algo != algo_id_t::kBeamHalo) {
+              // Short-Circuit: Must be same zone
+              if ((seg.zones & zone_mask) != zone_mask) {
+                // Debug Info
+                if (this->context_.config_.verbosity_ > 4) {
+                  edm::LogInfo("L1TEMTFpp")
+                      << "Hitmap Segment not in zone: "
+                      << " zone " << zone_id << " row " << row_id << " seg_id " << seg_id << " seg_phi " << seg.phi
+                      << " seg_zones " << seg.zones << " seg_tzones " << seg.tzones << std::endl;
+                }
+
+                continue;
               }
 
-              continue;
-            }
+              // Short-Circuit: Must be same timezone
+              if ((seg.tzones & tzone_mask) != tzone_mask) {
+                // Debug Info
+                if (this->context_.config_.verbosity_ > 4) {
+                  edm::LogInfo("L1TEMTFpp")
+                      << "Hitmap Segment not in timezone: "
+                      << " zone " << zone_id << " row " << row_id << " seg_id " << seg_id << " seg_phi " << seg.phi
+                      << " seg_zones " << seg.zones << " seg_tzones " << seg.tzones << std::endl;
+                }
 
-            // Short-Circuit: Must be same timezone
-            if ((seg.tzones & tzone_mask) != tzone_mask) {
-              // Debug Info
-              if (this->context_.config_.verbosity_ > 4) {
-                edm::LogInfo("L1TEMTFpp")
-                    << "Hitmap Segment not in timezone: "
-                    << " zone " << zone_id << " row " << row_id << " seg_id " << seg_id << " seg_phi " << seg.phi
-                    << " seg_zones " << seg.zones << " seg_tzones " << seg.tzones << std::endl;
+                continue;
               }
-
-              continue;
             }
 
             // Convert emtf_phi to col: truncate the last 4 bits, hence dividing by 16
@@ -141,7 +158,7 @@ void HitmapLayer::apply(const segment_collection_t& segments, std::vector<hitmap
       edm::LogInfo("L1TEMTFpp") << "Zone " << zone_id << " Image" << std::endl;
 
       // Print rows in reverse order
-      for (int row_id = (model_hm.size() - 1); 0 <= row_id; --row_id) {
+      for (int row_id = (model_hm_ptr->size() - 1); 0 <= row_id; --row_id) {
         const auto& row = hitmap[row_id];
 
         edm::LogInfo("L1TEMTFpp") << row_id << " ";

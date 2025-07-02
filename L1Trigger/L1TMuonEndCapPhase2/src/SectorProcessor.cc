@@ -87,7 +87,7 @@ void SectorProcessor::configureBx(const int& input_bx) {
   }
 
   // BX
-  proc_bx_ = input_bx - delay_bx; 
+  proc_bx_ = input_bx - delay_bx;
 }
 
 void SectorProcessor::select(const TriggerPrimitive& tp, const TPInfo& tp_info) {
@@ -145,13 +145,13 @@ void SectorProcessor::process(EMTFHitCollection& out_hits,
   // ===========================================================================
   const auto min_bx = this->context_.config_.min_bx_;
   const auto max_bx = this->context_.config_.max_bx_;
-  
+
   if (!((min_bx <= proc_bx_) && (proc_bx_ <= max_bx))) {
     return;
   }
 
   // ===========================================================================
-  // Convert EMTF Hits to Segments
+  // Convert Hits to EMTF Segments
   // ===========================================================================
 
   // Init Segment to Hit Map
@@ -162,9 +162,12 @@ void SectorProcessor::process(EMTFHitCollection& out_hits,
 
   populateSegments(bx_window_hits_, seg_to_hit, segments);
 
+  // ===========================================================================
   // Build Tracks
-  buildTracks(seg_to_hit, segments, false, out_tracks);  // With prompt setup
-  buildTracks(seg_to_hit, segments, true, out_tracks);   // With displaced setup
+  // ===========================================================================
+  // buildTracks(seg_to_hit, segments, algo_id_t::kPrompt, out_tracks);  // With prompt setup
+  // buildTracks(seg_to_hit, segments, algo_id_t::kDisplaced, out_tracks);   // With displaced setup
+  buildBeamHaloTracks(seg_to_hit, segments, out_tracks);  // With beam halo setup
 
   // ===========================================================================
   // Record segments/hits used in track building
@@ -290,8 +293,7 @@ void SectorProcessor::populateSegments(const std::vector<EMTFHitCollection>& bx_
   // Loop hit collections from earliest to latest BX
   std::map<int, unsigned int> bx_window_ch_seg;
 
-  for (const auto& bx_hits : bx_window_hits) {  
-
+  for (const auto& bx_hits : bx_window_hits) {
     std::map<int, unsigned int> bx_ch_seg;
 
     for (const auto& hit : bx_hits) {  // Begin loop hits in BX
@@ -349,8 +351,8 @@ void SectorProcessor::populateSegments(const std::vector<EMTFHitCollection>& bx_
         edm::LogInfo("L1TEMTFpp") << std::endl
                                   << "Event: " << event_->id() << " Endcap: " << endcap_ << " Sector: " << sector_
                                   << " BX: " << (proc_bx_) << " Hit iLink: " << hit_chamber << " Hit iSeg: " << ch_seg
-                                  << " Hit Host " << hit_host << " Hit Rel BX " << (hit_bx - proc_bx_) << " Hit Timezones "
-                                  << hit_timezones << std::endl;
+                                  << " Hit Host " << hit_host << " Hit Rel BX " << (hit_bx - proc_bx_)
+                                  << " Hit Timezones " << hit_timezones << std::endl;
 
         edm::LogInfo("L1TEMTFpp") << " id " << seg_id << " phi " << segments[seg_id].phi << " bend "
                                   << segments[seg_id].bend << " theta1 " << segments[seg_id].theta1 << " theta2 "
@@ -370,38 +372,73 @@ void SectorProcessor::populateSegments(const std::vector<EMTFHitCollection>& bx_
 
 void SectorProcessor::buildTracks(const std::map<int, int>& seg_to_hit,
                                   const segment_collection_t& segments,
-                                  const bool& displaced_en,
+                                  const algo_id_t& algo,
                                   EMTFTrackCollection& out_tracks) {
   // Apply Hitmap Building Layer: Convert segments into hitmaps
   std::vector<hitmap_t> zone_hitmaps;
 
-  context_.hitmap_building_layer_.apply(segments, zone_hitmaps);
+  context_.hitmap_building_layer_.apply(segments, algo, zone_hitmaps);
 
   // Apply Pattern Matching Layer: Match patterns to hitmaps to create roads
   std::vector<road_collection_t> zone_roads;
 
-  context_.pattern_matching_layer_.apply(zone_hitmaps, displaced_en, zone_roads);
+  context_.pattern_matching_layer_.apply(zone_hitmaps, algo, zone_roads);
 
   // Apply Road Sorting Layer: Find the best roads
   std::vector<road_t> best_roads;
 
-  context_.road_sorting_layer_.apply(v3::kNumTracks, zone_roads, best_roads);
+  context_.road_sorting_layer_.apply(v3::kNumTracks, zone_roads, algo, best_roads);
 
   // Apply Track Building Layer: Match segments to the best roads to create tracks
   std::vector<track_t> tracks;
 
-  context_.track_building_layer_.apply(segments, best_roads, displaced_en, tracks);
+  context_.track_building_layer_.apply(segments, best_roads, algo, tracks);
 
   // Apply Duplicate Removal Layer: Removes tracks that share a segment, keeping the one that has the highest quality
   context_.duplicate_removal_layer_.apply(tracks);
 
   // Apply Parameter Assigment Layer: Run NN on tracks
-  context_.parameter_assignment_layer_.apply(displaced_en, tracks);
+  context_.parameter_assignment_layer_.apply(algo == algo_id_t::kDisplaced, tracks);
 
   // Apply Output Layer
   EMTFTrackCollection bx_tracks;
 
-  context_.output_layer_.apply(endcap_, sector_, proc_bx_, seg_to_hit, tracks, displaced_en, bx_tracks);
+  context_.output_layer_.apply(endcap_, sector_, proc_bx_, seg_to_hit, tracks, algo, bx_tracks);
+
+  // Record tracks
+  out_tracks.insert(out_tracks.end(), bx_tracks.begin(), bx_tracks.end());
+}
+
+void SectorProcessor::buildBeamHaloTracks(const std::map<int, int>& seg_to_hit,
+                                          const segment_collection_t& segments,
+                                          EMTFTrackCollection& out_tracks) {
+  // Apply Hitmap Building Layer: Convert segments into hitmaps
+  std::vector<hitmap_t> zone_hitmaps;
+
+  context_.hitmap_building_layer_.apply(segments, algo_id_t::kBeamHalo, zone_hitmaps);
+
+  // Apply Pattern Matching Layer: Match patterns to hitmaps to create roads
+  std::vector<road_collection_t> zone_roads;
+
+  context_.pattern_matching_layer_.apply(zone_hitmaps, algo_id_t::kBeamHalo, zone_roads);
+
+  // Apply Road Sorting Layer: Find the best roads
+  std::vector<road_t> best_roads;
+
+  context_.road_sorting_layer_.apply(v3::kNumTracks, zone_roads, algo_id_t::kBeamHalo, best_roads);
+
+  // Apply Track Building Layer: Match segments to the best roads to create tracks
+  std::vector<track_t> tracks;
+
+  context_.track_building_layer_.apply(segments, best_roads, algo_id_t::kBeamHalo, tracks);
+
+  // Apply Duplicate Removal Layer: Removes tracks that share a segment, keeping the one that has the highest quality
+  context_.duplicate_removal_layer_.apply(tracks);
+
+  // Apply Output Layer
+  EMTFTrackCollection bx_tracks;
+
+  context_.output_layer_.apply(endcap_, sector_, proc_bx_, seg_to_hit, tracks, algo_id_t::kBeamHalo, bx_tracks);
 
   // Record tracks
   out_tracks.insert(out_tracks.end(), bx_tracks.begin(), bx_tracks.end());

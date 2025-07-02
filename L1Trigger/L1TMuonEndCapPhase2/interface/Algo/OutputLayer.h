@@ -21,7 +21,7 @@ namespace emtf::phase2::algo {
                const int&,
                const std::map<int, int>&,
                const std::vector<track_t>&,
-               const bool&,
+               const algo_id_t&,
                EMTFTrackCollection&) const;
 
   private:

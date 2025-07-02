@@ -22,6 +22,7 @@ namespace l1t::phase2 {
     void setSector(int16_t aSector) { sector_ = aSector; }
     void setBx(int16_t aBx) { bx_ = aBx; }
     void setUnconstrained(bool aUnconstrained) { unconstrained_ = aUnconstrained; }
+    void setAlgo(int16_t aAlgo) { algo_ = aAlgo; }
     void setValid(bool aValid) { valid_ = aValid; }
 
     void setModelPtAddress(int16_t aAddress) { model_pt_address_ = aAddress; }
@@ -31,6 +32,7 @@ namespace l1t::phase2 {
     void setModelQual(int16_t aModelQual) { model_qual_ = aModelQual; }
     void setModelPhi(int32_t aModelPhi) { model_phi_ = aModelPhi; }
     void setModelEta(int32_t aModelEta) { model_eta_ = aModelEta; }
+    void setModelRho(int32_t aModelRho) { model_rho_ = aModelRho; }
     void setModelFeatures(const features_t& aModelFeatures) { model_features_ = aModelFeatures; }
 
     void setEmtfQ(int16_t aEmtfQ) { emtf_q_ = aEmtfQ; }
@@ -53,6 +55,7 @@ namespace l1t::phase2 {
     int16_t sector() const { return sector_; }
     int16_t bx() const { return bx_; }
     bool unconstrained() const { return unconstrained_; }
+    int16_t algo() const { return algo_; }
     bool valid() const { return valid_; }
 
     int16_t modelPtAddress() const { return model_pt_address_; }
@@ -62,6 +65,7 @@ namespace l1t::phase2 {
     int16_t modelQual() const { return model_qual_; }
     int32_t modelPhi() const { return model_phi_; }
     int32_t modelEta() const { return model_eta_; }
+    int32_t modelRho() const { return model_rho_; }
     const features_t& modelFeatures() const { return model_features_; }
 
     int16_t emtfQ() const { return emtf_q_; }
@@ -84,6 +88,7 @@ namespace l1t::phase2 {
     int16_t sector_;
     int16_t bx_;
     bool unconstrained_;
+    int16_t algo_;
     bool valid_;
 
     int16_t model_pt_address_;
@@ -93,6 +98,7 @@ namespace l1t::phase2 {
     int16_t model_qual_;
     int32_t model_phi_;
     int32_t model_eta_;
+    int32_t model_rho_;
     features_t model_features_;
 
     int16_t emtf_q_;
