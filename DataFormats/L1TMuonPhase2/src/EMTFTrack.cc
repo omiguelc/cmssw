@@ -14,6 +14,8 @@ EMTFTrack::EMTFTrack()
       model_qual_(0),
       model_phi_(0),
       model_eta_(0),
+      model_rho_(0),
+      model_direction_(0),
       model_features_{},
       emtf_q_(0),
       emtf_pt_(0),

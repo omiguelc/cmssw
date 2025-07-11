@@ -89,6 +89,7 @@ void OutputLayer::apply(const int& endcap,
     out_trk.setModelPhi(track.phi);
     out_trk.setModelEta(track.theta);
     out_trk.setModelRho(track.rho);
+    out_trk.setModelDirection(track.direction);
     out_trk.setModelFeatures(model_features);
 
     out_trk.setEmtfQ(track.q);

@@ -113,6 +113,7 @@ namespace emtf::phase2 {
   typedef seg_theta_t trk_theta_t;
   typedef seg_rho_t trk_rho_t;
   typedef ap_uint<4> trk_beta_t;
+  typedef ap_uint<2> trk_direction_t;
   typedef ap_uint<1> trk_valid_t;
   typedef ap_uint<8> trk_site_seg_t;
   typedef ap_uint<1> trk_site_bit_t;
@@ -137,6 +138,7 @@ namespace emtf::phase2 {
     trk_theta_t theta;
     trk_rho_t rho;
     trk_beta_t beta;
+    trk_direction_t direction;
     trk_valid_t valid;
     site_segs_t site_segs;
     site_mask_t site_mask;

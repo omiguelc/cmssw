@@ -784,7 +784,7 @@ void TrackBuildingLayer::attachSegmentsByRadius(const segment_collection_t& segm
   }
 
   // Get site rho windows
-  std::vector<seg_rho_t> site_rho_window = {0, 22, 50, 50, 50, 37, 31, 46, 47,  0, 48,  0};
+  std::vector<seg_rho_t> site_rho_window = {0, 16, 52, 52, 52, 24, 24, 48, 48,  0, 48,  0};
 
   // Detach segments if rho_window < diff, it is invalid
   for (unsigned int site_id = 0; site_id < v3::kNumTrackSites; ++site_id) {
@@ -847,6 +847,66 @@ void TrackBuildingLayer::attachSegmentsByRadius(const segment_collection_t& segm
       }
     }
   }
+
+  // ===========================================================================
+  // Calculate Direction
+  // ---------------------------------------------------------------------------
+  ap_uint<8> st1_word = 0;
+  if (track.site_mask[1] == 1) {
+    st1_word = segments[track.site_segs[1]].bx;
+    st1_word += 1;
+  } else if (track.site_mask[5] == 1) {
+    st1_word = segments[track.site_segs[5]].bx;
+    st1_word += 1;
+  } 
+
+  ap_uint<8> st2_word = 0;
+  if (track.site_mask[2] == 1) {
+    st2_word = segments[track.site_segs[2]].bx;
+    st2_word += 1;
+  } else if (track.site_mask[6] == 1) {
+    st2_word = segments[track.site_segs[6]].bx;
+    st2_word += 1;
+  } else if (track.site_mask[10] == 1) {
+    st2_word = segments[track.site_segs[10]].bx;
+    st2_word += 1;
+  } 
+
+  ap_uint<8> st3_word = 0;
+  if (track.site_mask[3] == 1) {
+    st3_word = segments[track.site_segs[3]].bx;
+    st3_word += 1;
+  } else if (track.site_mask[7] == 1) {
+    st3_word = segments[track.site_segs[7]].bx;
+    st3_word += 1;
+  } 
+
+  ap_uint<8> st4_word = 0;
+  if (track.site_mask[4] == 1) {
+    st4_word = segments[track.site_segs[4]].bx;
+    st4_word += 1;
+  } else if (track.site_mask[8] == 1) {
+    st4_word = segments[track.site_segs[8]].bx;
+    st4_word += 1;
+  } 
+
+  ap_uint<8> bx_word = st1_word;
+  bx_word += st2_word << 2;
+  bx_word += st3_word << 4;
+  bx_word += st4_word << 6;
+
+  std::vector<trk_direction_t> direction_lut = {
+      0,0,0,0,0,1,2,0,0,3,1,0,0,0,0,0,0,1,2,0,1,1,2,0,2,0,2,0,0,0,0,0,
+      0,3,1,0,3,3,0,0,1,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+      0,1,2,0,1,1,2,0,2,0,2,0,0,0,0,0,1,1,2,0,1,1,2,0,2,0,2,0,0,0,0,0,
+      2,0,2,0,0,0,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+      0,3,1,0,3,3,0,0,1,3,1,0,0,0,0,0,3,3,0,0,3,3,0,0,0,0,0,0,0,0,0,0,
+      1,3,1,0,3,3,0,0,1,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  };
+
+  track.direction = direction_lut[bx_word];
 
   // ===========================================================================
   // Collect Segment Features

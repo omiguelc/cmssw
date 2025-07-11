@@ -33,6 +33,7 @@ namespace l1t::phase2 {
     void setModelPhi(int32_t aModelPhi) { model_phi_ = aModelPhi; }
     void setModelEta(int32_t aModelEta) { model_eta_ = aModelEta; }
     void setModelRho(int32_t aModelRho) { model_rho_ = aModelRho; }
+    void setModelDirection(int32_t aModelDirection) { model_direction_ = aModelDirection; }
     void setModelFeatures(const features_t& aModelFeatures) { model_features_ = aModelFeatures; }
 
     void setEmtfQ(int16_t aEmtfQ) { emtf_q_ = aEmtfQ; }
@@ -66,6 +67,7 @@ namespace l1t::phase2 {
     int32_t modelPhi() const { return model_phi_; }
     int32_t modelEta() const { return model_eta_; }
     int32_t modelRho() const { return model_rho_; }
+    int32_t modelDirection() const { return model_direction_; }
     const features_t& modelFeatures() const { return model_features_; }
 
     int16_t emtfQ() const { return emtf_q_; }
@@ -99,6 +101,7 @@ namespace l1t::phase2 {
     int32_t model_phi_;
     int32_t model_eta_;
     int32_t model_rho_;
+    int32_t model_direction_;
     features_t model_features_;
 
     int16_t emtf_q_;
