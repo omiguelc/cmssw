@@ -165,8 +165,8 @@ void SectorProcessor::process(EMTFHitCollection& out_hits,
   // ===========================================================================
   // Build Tracks
   // ===========================================================================
-  // buildTracks(seg_to_hit, segments, algo_id_t::kPrompt, out_tracks);  // With prompt setup
-  // buildTracks(seg_to_hit, segments, algo_id_t::kDisplaced, out_tracks);   // With displaced setup
+  buildTracks(seg_to_hit, segments, algo_id_t::kPrompt, out_tracks);  // With prompt setup
+  buildTracks(seg_to_hit, segments, algo_id_t::kDisplaced, out_tracks);   // With displaced setup
   buildBeamHaloTracks(seg_to_hit, segments, out_tracks);  // With beam halo setup
 
   // ===========================================================================

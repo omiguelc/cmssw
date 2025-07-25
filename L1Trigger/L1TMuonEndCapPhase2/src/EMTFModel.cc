@@ -681,7 +681,7 @@ EMTFModel::EMTFModel(const EMTFContext& context) : context_(context) {
     };
 
     std::vector<zones::pattern_t> bh_zone_pd = { // Pattern N: Row0..RowM
-        {{51, 55, 59}, {52, 55, 58}, {53, 55, 57}, {50, 55, 60}, {52, 55, 58}, {52, 55, 58}, {53, 55, 57}, {51, 55, 59}},
+        {{50, 55, 60}, {52, 55, 58}, {52, 55, 58}, {50, 55, 60}, {52, 55, 58}, {52, 55, 58}, {53, 55, 57}, {52, 55, 58}},
     };
 
     zones::quality_lut_t bh_ql = {
