@@ -784,7 +784,7 @@ void TrackBuildingLayer::attachSegmentsByRadius(const segment_collection_t& segm
   }
 
   // Get site rho windows
-  std::vector<seg_rho_t> site_rho_window = {0, 18, 15, 13, 19, 25, 28, 34, 40,  0,  7,  0};
+  std::vector<seg_rho_t> site_rho_window = {0, 20, 22, 15, 14, 27, 31, 33, 30, 0, 7, 0};
 
   // Detach segments if rho_window < diff, it is invalid
   for (unsigned int site_id = 0; site_id < v3::kNumTrackSites; ++site_id) {

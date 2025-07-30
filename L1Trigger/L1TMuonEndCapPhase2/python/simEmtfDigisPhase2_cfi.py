@@ -34,7 +34,7 @@ simEmtfDigisMCPhase2 = cms.EDProducer(
     GE0Enabled = cms.bool(False),
 
     # BX
-    MinBX    = cms.int32(-3), # Minimum BX considered
+    MinBX    = cms.int32(-2), # Minimum BX considered
     MaxBX    = cms.int32(2), # Maximum BX considered
     BXWindow = cms.int32(2),  # Number of BX whose primitives can be included in the same track
 
